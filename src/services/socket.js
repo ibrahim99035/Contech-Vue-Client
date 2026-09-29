@@ -2,7 +2,9 @@ import { io } from 'socket.io-client'
 import { useAuthStore } from '@/stores/auth'
 import { ref, computed } from 'vue'
 
-const SOCKET_URL = '/ws'
+// See src/services/api.js — empty in dev (Vite proxies /ws), absolute when the
+// client is hosted separately from the API.
+const SOCKET_URL = `${import.meta.env.VITE_API_URL || ''}/ws`
 
 class SocketService {
   constructor() {

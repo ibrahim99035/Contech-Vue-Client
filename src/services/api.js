@@ -1,8 +1,17 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 
+// Call sites already carry their own path prefix (`/api/...` or
+// `/admin/dashboard/...`), so this is the origin only — never include `/api`
+// here or every request would get it twice.
+//
+// Leave VITE_API_URL empty to stay same-origin (works under `vite dev`, which
+// proxies /api, /ws, /health and /admin/dashboard to the local server). Set it
+// when the client is served from a different host than the API.
+const API_URL = import.meta.env.VITE_API_URL || ''
+
 const api = axios.create({
-  baseURL: '',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json'
   },
