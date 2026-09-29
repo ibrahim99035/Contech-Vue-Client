@@ -18,7 +18,10 @@ export const useRoomStore = defineStore('room', () => {
     loading.value = true
     try {
       const response = await api.get(`/api/rooms-handler/rooms/apartment/${apartmentId}`, { params })
-      rooms.value = response.data.data
+      // This endpoint returns data: { rooms: [...], apartment: {...} }, not a
+      // bare array — assigning data directly left `rooms` an object with no
+      // length, so every "Failed to fetch rooms" / empty-list read failed.
+      rooms.value = response.data.data.rooms || []
       if (response.data.pagination) {
         pagination.value = response.data.pagination
       }
@@ -71,10 +74,13 @@ export const useRoomStore = defineStore('room', () => {
     loading.value = true
     try {
       const response = await api.post('/api/rooms-handler/rooms/create', data)
-      rooms.value.unshift(response.data.data)
-      userRooms.value.unshift(response.data.data)
+      // The endpoint nests the document under data.room; reading data directly
+      // pushed a { room: {...} } wrapper into the list instead of the room.
+      const room = response.data.data.room
+      rooms.value.unshift(room)
+      userRooms.value.unshift(room)
       toast.success('Room created successfully!')
-      return response.data.data
+      return room
     } catch (error) {
       toast.error('Failed to create room')
       throw error
