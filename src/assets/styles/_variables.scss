@@ -1,0 +1,90 @@
+// ===== Contech IoT Theme Variables =====
+
+:root {
+  // Brand / primary palette
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-600: #2563eb;
+  --primary-color: #3b82f6;
+  --primary-color-text: #ffffff;
+
+  // Surfaces
+  --surface-ground: #f8fafc;
+  --surface-card: #ffffff;
+  --surface-border: #e2e8f0;
+  --surface-hover: #f1f5f9;
+  --surface-200: #e2e8f0;
+  --surface-300: #cbd5e1;
+
+  // Text
+  --text-color: #0f172a;
+  --text-color-secondary: #64748b;
+
+  // Borders & shadow
+  --border-radius: 8px;
+  --border-radius-lg: 14px;
+  --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-2: 0 4px 12px rgba(15, 23, 42, 0.1);
+
+  // Color scale helpers
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+
+  --green-50: #f0fdf4;
+  --green-100: #dcfce7;
+  --green-500: #22c55e;
+  --green-600: #16a34a;
+  --green-800: #166534;
+
+  --red-50: #fef2f2;
+  --red-100: #fee2e2;
+  --red-200: #fecaca;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --red-800: #991b1b;
+
+  --orange-50: #fff7ed;
+  --orange-100: #ffedd5;
+  --orange-500: #f97316;
+  --orange-600: #ea580c;
+
+  --yellow-50: #fefce8;
+  --yellow-100: #fef9c3;
+  --yellow-600: #ca8a04;
+  --yellow-800: #854d0e;
+
+  --purple-50: #faf5ff;
+  --purple-100: #f3e8ff;
+  --purple-600: #9333ea;
+
+  --pink-50: #fdf2f8;
+  --pink-100: #fce7f3;
+  --pink-600: #db2777;
+
+  --teal-50: #f0fdfa;
+  --teal-100: #ccfbf1;
+  --teal-600: #0d9488;
+
+  --cyan-50: #ecfeff;
+  --cyan-100: #cffafe;
+  --cyan-600: #0891b2;
+
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+}
+
+// ===== Dark mode overrides =====
+.dark-mode {
+  --surface-ground: #0f172a;
+  --surface-card: #1e293b;
+  --surface-border: #334155;
+  --surface-hover: #26354a;
+  --surface-200: #334155;
+  --surface-300: #475569;
+  --text-color: #f1f5f9;
+  --text-color-secondary: #94a3b8;
+}

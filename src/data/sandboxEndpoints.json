@@ -1,0 +1,145 @@
+{
+  "auth": {
+    "label": "Authentication",
+    "endpoints": [
+      { "method": "GET", "path": "/health", "desc": "Liveness probe (no auth)", "anon": true },
+      { "method": "GET", "path": "/api/auth/me", "desc": "Current user profile" },
+      { "method": "GET", "path": "/api/auth/verify", "desc": "Re-read emailActivated" },
+      { "method": "GET", "path": "/api/auth/google/status", "desc": "Google auth status" },
+      { "method": "GET", "path": "/api/auth/check-google-link", "desc": "Is account linked to Google?" },
+      { "method": "POST", "path": "/api/auth/login", "desc": "Log in", "anon": true, "body": "{\"email\":\"user@example.com\",\"password\":\"YOUR_PASSWORD\"}" },
+      { "method": "POST", "path": "/api/auth/register", "desc": "Create customer account", "anon": true, "body": "{\"name\":\"Sandbox User\",\"email\":\"sandbox@example.com\",\"password\":\"Pass@123456\",\"role\":\"customer\"}" },
+      { "method": "PUT", "path": "/api/auth/update-password", "desc": "Change own password", "body": "{\"oldPassword\":\"YOUR_OLD_PASSWORD\",\"newPassword\":\"YOUR_NEW_PASSWORD\"}" },
+      { "method": "POST", "path": "/api/auth/forgot-password", "desc": "Request reset email", "anon": true, "body": "{\"email\":\"user@example.com\"}" },
+      { "method": "PUT", "path": "/api/auth/reset-password", "desc": "Consume reset token", "anon": true, "body": "{\"resetToken\":\"<token>\",\"newPassword\":\"Pass@123456\"}" },
+      { "method": "PUT", "path": "/api/auth/activate-email", "desc": "Activate email", "anon": true, "body": "{\"activationToken\":\"<token>\"}" },
+      { "method": "POST", "path": "/api/auth/activation-token", "desc": "Resend activation", "body": "{\"email\":\"user@example.com\"}" },
+      { "method": "DELETE", "path": "/api/auth/delete-account", "desc": "Delete own account (destructive)", "danger": true, "body": "{\"password\":\"YOUR_PASSWORD\"}" }
+    ]
+  },
+  "apartments": {
+    "label": "Apartments",
+    "endpoints": [
+      { "method": "GET", "path": "/api/apartments-handler/apartments/member", "desc": "Apartments I belong to" },
+      { "method": "POST", "path": "/api/apartments-handler/apartments/create-apartment", "desc": "Create apartment", "body": "{\"name\":\"Sandbox Apartment\"}" },
+      { "method": "PUT", "path": "/api/apartments-handler/apartments/update-name", "desc": "Rename apartment", "body": "{\"apartmentId\":\"<apartmentId>\",\"name\":\"Renamed\"}" },
+      { "method": "PUT", "path": "/api/apartments-handler/apartments/assign-members", "desc": "Assign members", "body": "{\"apartmentId\":\"<apartmentId>\",\"members\":[]}" },
+      { "method": "GET", "path": "/api/apartments-handler/apartments/:id/members", "desc": "Apartment members", "params": { "id": "<apartmentId>" } },
+      { "method": "DELETE", "path": "/api/apartments-handler/apartments/remover-member/:apartmentId/:memberId", "desc": "Remove member (destructive)", "danger": true, "params": { "apartmentId": "<apartmentId>", "memberId": "<userId>" } },
+      { "method": "PUT", "path": "/api/apartments-handler/apartments/:apartmentId/exit", "desc": "Leave apartment (destructive)", "danger": true, "params": { "apartmentId": "<apartmentId>" } }
+    ]
+  },
+  "rooms": {
+    "label": "Rooms",
+    "endpoints": [
+      { "method": "GET", "path": "/api/rooms-handler/rooms/user/get-all", "desc": "Rooms I belong to" },
+      { "method": "GET", "path": "/api/rooms-handler/rooms/apartment/:apartmentId", "desc": "Rooms in an apartment", "params": { "apartmentId": "<apartmentId>" } },
+      { "method": "POST", "path": "/api/rooms-handler/rooms/create", "desc": "Create room", "body": "{\"name\":\"Sandbox Room\",\"apartmentId\":\"<apartmentId>\"}" },
+      { "method": "PUT", "path": "/api/rooms-handler/rooms/:id/update-name", "desc": "Rename room", "params": { "id": "<roomId>" }, "body": "{\"name\":\"Renamed\"}" },
+      { "method": "PUT", "path": "/api/rooms-handler/rooms/:id/add-users", "desc": "Add users to room", "params": { "id": "<roomId>" }, "body": "{\"users\":[]}" },
+      { "method": "PUT", "path": "/api/rooms-handler/rooms/:roomId/update-password", "desc": "Set room password", "params": { "roomId": "<roomId>" }, "body": "{\"password\":\"sandbox123\"}" },
+      { "method": "GET", "path": "/api/rooms-handler/rooms/get-users/:roomId", "desc": "Room members", "params": { "roomId": "<roomId>" } },
+      { "method": "PUT", "path": "/api/rooms-handler/rooms/remove-user/:roomId", "desc": "Remove users from room", "params": { "roomId": "<roomId>" }, "body": "{\"userIds\":[]}" },
+      { "method": "PUT", "path": "/api/rooms-handler/rooms/exit-room/:roomId", "desc": "Leave room (destructive)", "danger": true, "params": { "roomId": "<roomId>" } }
+    ]
+  },
+  "devices": {
+    "label": "Devices",
+    "endpoints": [
+      { "method": "GET", "path": "/api/device-handler/devices/room/:roomId", "desc": "Devices in a room", "params": { "roomId": "<roomId>" } },
+      { "method": "GET", "path": "/api/device-handler/devices/room/:roomId/orders", "desc": "Device order in a room", "params": { "roomId": "<roomId>" } },
+      { "method": "GET", "path": "/api/device-handler/devices/room/:roomId/orders/:deviceId", "desc": "Order for one device", "params": { "roomId": "<roomId>", "deviceId": "<deviceId>" } },
+      { "method": "GET", "path": "/api/device-handler/devices/get-users/device/:deviceId", "desc": "Device users", "params": { "deviceId": "<deviceId>" } },
+      { "method": "POST", "path": "/api/device-handler/devices/create", "desc": "Create device", "body": "{\"name\":\"Sandbox Device\",\"type\":\"Light\",\"room\":\"<roomId>\",\"order\":1,\"componentNumber\":\"SBX-1\"}" },
+      { "method": "PUT", "path": "/api/device-handler/devices/:id/update-name", "desc": "Rename device", "params": { "id": "<deviceId>" }, "body": "{\"name\":\"Renamed\"}" },
+      { "method": "PUT", "path": "/api/device-handler/devices/:id/update-component-number", "desc": "Change component number", "params": { "id": "<deviceId>" }, "body": "{\"componentNumber\":\"SBX-2\"}" },
+      { "method": "PUT", "path": "/api/device-handler/devices/:deviceId/update-order", "desc": "Reorder device", "params": { "deviceId": "<deviceId>" }, "body": "{\"order\":2}" },
+      { "method": "PUT", "path": "/api/device-handler/devices/:deviceId/toggle-activation", "desc": "Toggle device active", "params": { "deviceId": "<deviceId>" } },
+      { "method": "PUT", "path": "/api/device-handler/devices/:deviceId/assign-users", "desc": "Assign device users", "params": { "deviceId": "<deviceId>" }, "body": "{\"users\":[]}" },
+      { "method": "PUT", "path": "/api/device-handler/devices/remove-user/device/:deviceId/user/:userId", "desc": "Remove device user", "params": { "deviceId": "<deviceId>", "userId": "<userId>" } }
+    ]
+  },
+  "tasks": {
+    "label": "Tasks",
+    "endpoints": [
+      { "method": "GET", "path": "/api/task-handler/tasks/user/my-tasks", "desc": "Tasks I created" },
+      { "method": "GET", "path": "/api/task-handler/tasks/user/assigned", "desc": "Tasks assigned to me" },
+      { "method": "GET", "path": "/api/task-handler/tasks/filter", "desc": "Filter tasks" },
+      { "method": "GET", "path": "/api/task-handler/tasks/get-tasks/device/:deviceId", "desc": "Tasks for a device", "params": { "deviceId": "<deviceId>" } },
+      { "method": "GET", "path": "/api/task-handler/tasks/get-task/:taskId", "desc": "Task by id", "params": { "taskId": "<taskId>" } },
+      { "method": "POST", "path": "/api/task-handler/tasks/create-task", "desc": "Create task", "body": "{\"name\":\"Sandbox Task\",\"deviceId\":\"<deviceId>\",\"command\":\"turnOn\"}" },
+      { "method": "PUT", "path": "/api/task-handler/tasks/update/:taskId/details", "desc": "Update task details", "params": { "taskId": "<taskId>" }, "body": "{\"name\":\"Renamed\"}" },
+      { "method": "PUT", "path": "/api/task-handler/tasks/:taskId/schedule/update", "desc": "Update task schedule", "params": { "taskId": "<taskId>" }, "body": "{\"schedule\":{}}" },
+      { "method": "PUT", "path": "/api/task-handler/tasks/:taskId/status", "desc": "Set task status", "params": { "taskId": "<taskId>" }, "body": "{\"status\":\"completed\"}" },
+      { "method": "PUT", "path": "/api/task-handler/tasks/:taskId/notifications/add-recepiant", "desc": "Add notification recipient", "params": { "taskId": "<taskId>" }, "body": "{\"userId\":\"<userId>\"}" }
+    ]
+  },
+  "subscription": {
+    "label": "Subscription",
+    "endpoints": [
+      { "method": "GET", "path": "/api/subscription/my", "desc": "My subscription" },
+      { "method": "GET", "path": "/api/subscription/plans", "desc": "List plans", "admin": true },
+      { "method": "GET", "path": "/api/subscription/plans/:id", "desc": "Plan by id", "admin": true, "params": { "id": "<planId>" } },
+      { "method": "GET", "path": "/api/subscription/features", "desc": "List features", "admin": true },
+      { "method": "GET", "path": "/api/subscription/coupons", "desc": "List coupons", "admin": true },
+      { "method": "GET", "path": "/api/subscription/admin-activities", "desc": "Subscription activity log", "admin": true }
+    ]
+  },
+  "adminUsers": {
+    "label": "Admin - Users",
+    "endpoints": [
+      { "method": "GET", "path": "/admin/dashboard/users/get-all-users", "desc": "All users (paged)", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/users/search-users", "desc": "Search users", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/users/user-statistics", "desc": "User statistics", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/users/get-user-by-id/:id", "desc": "User by id", "admin": true, "params": { "id": "<userId>" } }
+    ]
+  },
+  "adminApartments": {
+    "label": "Admin - Apartments",
+    "endpoints": [
+      { "method": "GET", "path": "/admin/dashboard/apartments/all-apartments", "desc": "All apartments (paged)", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/apartments/search-apartments", "desc": "Search apartments", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/apartments/apartment-statistics", "desc": "Apartment statistics", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/apartments/apartment-members-analysis", "desc": "Members analysis", "admin": true }
+    ]
+  },
+  "adminRooms": {
+    "label": "Admin - Rooms",
+    "endpoints": [
+      { "method": "GET", "path": "/admin/dashboard/rooms/get-all-rooms", "desc": "All rooms (paged)", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/rooms/search-rooms", "desc": "Search rooms", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/rooms/room-statistics", "desc": "Room statistics", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/rooms/get-room-usage-analysis", "desc": "Room usage analysis", "admin": true }
+    ]
+  },
+  "adminDevices": {
+    "label": "Admin - Devices",
+    "endpoints": [
+      { "method": "GET", "path": "/admin/dashboard/devices/get-all-devices", "desc": "All devices (paged)", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/devices/search-devices", "desc": "Search devices", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/devices/get-device-statistics", "desc": "Device statistics", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/devices/get-device-performance-analysis", "desc": "Performance analysis", "admin": true }
+    ]
+  },
+  "adminTasks": {
+    "label": "Admin - Tasks",
+    "endpoints": [
+      { "method": "GET", "path": "/admin/dashboard/tasks/get-all-tasks", "desc": "All tasks (paged)", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/tasks/get-task-analytics", "desc": "Task analytics", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/tasks/search-tasks", "desc": "Search tasks", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/tasks/get-tasks-scheduled-today", "desc": "Scheduled today", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/tasks/get-overdue-tasks", "desc": "Overdue tasks", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/tasks/get-tasks-with-history", "desc": "Tasks with history", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/tasks/get-tasks-by-status/:status", "desc": "By status", "admin": true, "params": { "status": "pending" } }
+    ]
+  },
+  "adminLimits": {
+    "label": "Admin - Limits & Images",
+    "endpoints": [
+      { "method": "GET", "path": "/admin/dashboard/subscription-limits/get-usage", "desc": "Limit usage", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/subscription-limits/get-limits", "desc": "Configured limits", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/background-imgs-set/list", "desc": "Background images", "admin": true },
+      { "method": "GET", "path": "/admin/dashboard/background-imgs-set/analytics/stats", "desc": "Image stats", "admin": true }
+    ]
+  }
+}

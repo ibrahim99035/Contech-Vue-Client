@@ -1,0 +1,5 @@
+dist/
+node_modules/
+node-scripts/
+*.min.js
+vue_sfc_check.cjs
