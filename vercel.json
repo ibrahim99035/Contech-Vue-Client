@@ -5,7 +5,8 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://api-bridge.contech-iot.com/api/:path*" },
-    { "source": "/health", "destination": "https://api-bridge.contech-iot.com/health" }
+    { "source": "/health", "destination": "https://api-bridge.contech-iot.com/health" },
+    { "source": "/((?!api/|health$).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
