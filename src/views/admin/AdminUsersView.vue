@@ -36,35 +36,50 @@
                   </div>
                 </template>
                 
-                <Column field="name" header="Name" :style="{ width: '30%' }">
+                <Column field="name" header="Name" :style="{ width: '24%' }">
                   <template #body="slotProps">
                     <span>{{ slotProps.data.name }}</span>
                   </template>
                 </Column>
                 
-                <Column field="email" header="Email" :style="{ width: '35%' }">
+                <Column field="email" header="Email" :style="{ width: '30%' }">
                   <template #body="slotProps">
                     <span>{{ slotProps.data.email }}</span>
                   </template>
                 </Column>
                 
-                <Column field="role" header="Role" :style="{ width: '15%' }">
+                <Column field="role" header="Role" :style="{ width: '12%' }">
                   <template #body="slotProps">
                     <span v-if="slotProps.data.role" class="badge">{{ slotProps.data.role }}</span>
                     <span class="text-muted" v-else>None</span>
                   </template>
                 </Column>
                 
-                <Column field="active" header="Status" :style="{ width: '12%' }">
+                <Column field="active" header="Status" :style="{ width: '10%' }">
                   <template #body="slotProps">
                     <span v-if="slotProps.data.active" class="badge badge-success">Active</span>
                     <span v-else class="badge badge-danger">Inactive</span>
                   </template>
                 </Column>
                 
-                <Column field="createdAt" header="Created" :style="{ width: '20%' }">
+                <Column field="createdAt" header="Created" :style="{ width: '16%' }">
                   <template #body="slotProps">
                     <span>{{ formatDate(slotProps.data.createdAt) }}</span>
+                  </template>
+                </Column>
+
+                <Column header="Actions" :style="{ width: '8%' }">
+                  <template #body="slotProps">
+                    <button
+                      type="button"
+                      class="btn-icon"
+                      title="Delete user"
+                      aria-label="Delete user"
+                      :disabled="isCurrentUser(slotProps.data)"
+                      @click.stop="startDelete(slotProps.data)"
+                    >
+                      <i class="pi pi-trash"></i>
+                    </button>
                   </template>
                 </Column>
               </DataTable>
@@ -86,6 +101,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
 import { useApartmentStore } from '@/stores/apartment'
+import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import DataTable from '@/components/common/DataTable.vue'
 import Column from 'primevue/column'
@@ -93,6 +109,7 @@ import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 
 const router = useRouter()
 const apartmentStore = useApartmentStore()
+const authStore = useAuthStore()
 const toast = useToast()
 
 const users = ref([])
@@ -143,13 +160,31 @@ function editUser(user) {
   // Could open edit dialog
 }
 
-function confirmDelete() {
+function isCurrentUser(user) {
+  const me = authStore.user
+  if (!me || !user) return false
+  return String(user._id || user.id) === String(me._id || me.id)
+}
+
+function startDelete(user) {
+  selectedUser.value = user
+  showDeleteDialog.value = true
+}
+
+async function confirmDelete() {
   if (!selectedUser.value) return
-  
-  // Would call API to delete user
-  showDeleteDialog.value = false
-  selectedUser.value = null
-  toast.success('User deleted successfully!')
+
+  const target = selectedUser.value
+  try {
+    await api.delete(`/admin/dashboard/users/delete-account/${target._id || target.id}`)
+    showDeleteDialog.value = false
+    selectedUser.value = null
+    toast.success(`User ${target.name} deleted successfully!`)
+    loadUsers(pagination.value.page, searchQuery.value)
+  } catch (error) {
+    const message = error?.response?.data?.message
+    toast.error(typeof message === 'string' ? message : 'Failed to delete user')
+  }
 }
 
 function formatDate(dateString) {
@@ -167,6 +202,30 @@ watch(() => apartmentStore.apartments, (newApartments) => {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables';
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--red-50);
+    color: var(--red-600);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
 
 .admin-users-view {
   .view-header {
