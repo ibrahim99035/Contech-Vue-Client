@@ -101,13 +101,14 @@
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useTaskStore } from '@/stores/task'
 import { useDeviceStore } from '@/stores/device'
 import { useToast } from 'vue-toastification'
 import MainLayout from '@/layouts/MainLayout.vue'
 
 const router = useRouter()
+const route = useRoute()
 const taskStore = useTaskStore()
 const deviceStore = useDeviceStore()
 const toast = useToast()
@@ -135,6 +136,12 @@ async function loadDevices() {
   try {
     const res = await deviceStore.fetchAllDevices({ limit: 100 })
     devices.value = res.data || []
+
+    // Arriving from a device's "New Task" link: preselect it if it is listed.
+    const wanted = route.query.device && String(route.query.device)
+    if (!form.device && wanted && devices.value.some((d) => d._id === wanted || d.id === wanted)) {
+      form.device = wanted
+    }
   } catch (e) {
     // handled in store
   }
@@ -159,7 +166,11 @@ async function submit() {
       timezone: form.timezone || 'UTC',
       action: { ...form.action },
       schedule: {
-        startDate: new Date(`${schedule.startDate}T00:00:00`).toISOString(),
+        // Parse the picked calendar date as UTC midnight: the server formats
+        // startDate in its own (UTC) timezone to check it is in the future,
+        // so local midnight would shift the date a day backwards when the
+        // browser runs ahead of UTC and reject the task as already past.
+        startDate: new Date(`${schedule.startDate}T00:00:00.000Z`).toISOString(),
         startTime: schedule.startTime,
         endDate: schedule.endDate,
         recurrence: {

@@ -255,8 +255,9 @@ async function loadTasks() {
   if (!device.value) return
   tasksLoading.value = true
   try {
-    const response = await taskStore.fetchTasksByDevice(device.value._id)
-    deviceTasks.value = response.data || []
+    await taskStore.fetchTasksByDevice(device.value._id)
+    // The by-device route returns { device, tasks }; the store normalizes it.
+    deviceTasks.value = taskStore.deviceTasks
   } catch (error) {
     console.error('Failed to load tasks:', error)
   } finally {

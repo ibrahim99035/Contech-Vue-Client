@@ -86,7 +86,7 @@ const task = ref(null)
 const loading = ref(false)
 const updatingStatus = ref(false)
 const deleting = ref(false)
-const statuses = ['active', 'completed', 'failed', 'canceled']
+const statuses = ['active', 'completed', 'failed', 'cancelled']
 
 const actionSummary = computed(() => {
   if (!task.value?.action) return '—'
@@ -213,7 +213,7 @@ onMounted(load)
     &.active { background: var(--green-100); color: var(--green-800); }
     &.completed { background: var(--blue-100); color: var(--blue-600); }
     &.failed { background: var(--red-100); color: var(--red-800); }
-    &.canceled { background: var(--gray-100); color: var(--gray-600); }
+    &.cancelled { background: var(--gray-100); color: var(--gray-600); }
   }
 
   .status-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }

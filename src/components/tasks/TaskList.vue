@@ -7,7 +7,7 @@
           <option value="active">Active</option>
           <option value="completed">Completed</option>
           <option value="failed">Failed</option>
-          <option value="canceled">Canceled</option>
+          <option value="cancelled">Cancelled</option>
         </select>
         <select v-model="recurrenceFilter" class="filter-select">
           <option value="">All Recurrences</option>
@@ -175,7 +175,7 @@ function formatDateTime(dateString) {
 }
 
 function toggleTaskStatus(task) {
-  const newStatus = task.status === 'active' ? 'canceled' : 'active'
+  const newStatus = task.status === 'active' ? 'cancelled' : 'active'
   emit('toggle-status', task._id, newStatus)
 }
 </script>
@@ -248,7 +248,7 @@ function toggleTaskStatus(task) {
     &.status-failed td:first-child { border-left: 3px solid var(--red-500); }
     &.status-active td:first-child { border-left: 3px solid var(--green-500); }
     &.status-completed td:first-child { border-left: 3px solid var(--blue-500); }
-    &.status-canceled td:first-child { border-left: 3px solid var(--gray-500); }
+    &.status-cancelled td:first-child { border-left: 3px solid var(--gray-500); }
   }
 }
 
@@ -326,7 +326,7 @@ function toggleTaskStatus(task) {
   &.active { background: var(--green-100); color: var(--green-600); }
   &.completed { background: var(--blue-100); color: var(--blue-600); }
   &.failed { background: var(--red-100); color: var(--red-600); }
-  &.canceled { background: var(--gray-100); color: var(--gray-600); }
+  &.cancelled { background: var(--gray-100); color: var(--gray-600); }
 }
 
 .task-actions {

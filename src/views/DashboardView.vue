@@ -392,7 +392,7 @@ onMounted(() => {
     &.active { background: var(--green-500); }
     &.completed { background: var(--blue-500); }
     &.failed { background: var(--red-500); }
-    &.canceled { background: var(--gray-500); }
+    &.cancelled { background: var(--gray-500); }
   }
   
   .task-info {

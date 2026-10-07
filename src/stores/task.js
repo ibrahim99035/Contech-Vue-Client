@@ -17,15 +17,35 @@ export const useTaskStore = defineStore('task', () => {
   const tasksList = computed(() => tasks.value)
   const hasTasks = computed(() => tasks.value.length > 0)
 
-  const TASK_STATUSES = ['active', 'completed', 'failed', 'canceled']
+  const TASK_STATUSES = ['active', 'completed', 'failed', 'cancelled']
   const RECURRENCE_TYPES = ['once', 'daily', 'weekly', 'monthly', 'yearly', 'custom']
   const ACTION_TYPES = ['status_change', 'temperature_set', 'other']
+
+  // The task routes do not share one envelope: my-tasks returns
+  // { data: [...] }, by-device/assigned/filter return { tasks }, detail and
+  // update return { task }, and create returns { data: { task } }. Read
+  // whichever key is present instead of assuming data.
+  function asTaskArray(body) {
+    const list = Array.isArray(body?.data) ? body.data : body?.tasks
+    return Array.isArray(list) ? list : []
+  }
+
+  function asTask(body) {
+    return body?.task || body?.data?.task || (body?.data?._id ? body.data : null)
+  }
+
+  function errorMessage(error, fallback) {
+    const detail = error?.response?.data?.error ?? error?.response?.data?.message
+    if (Array.isArray(detail)) return detail.join(', ')
+    if (typeof detail === 'string' && detail) return detail
+    return fallback
+  }
 
   async function fetchAllTasks(params = {}) {
     loading.value = true
     try {
       const response = await api.get('/api/task-handler/tasks/user/my-tasks', { params })
-      tasks.value = response.data.data
+      tasks.value = asTaskArray(response.data)
       if (response.data.pagination) {
         pagination.value = response.data.pagination
       }
@@ -42,7 +62,7 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.get('/api/task-handler/tasks/user/my-tasks', { params })
-      userTasks.value = response.data.data
+      userTasks.value = asTaskArray(response.data)
       return response.data
     } catch (error) {
       toast.error('Failed to fetch user tasks')
@@ -56,7 +76,7 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.get(`/api/task-handler/tasks/get-tasks/device/${deviceId}`, { params })
-      deviceTasks.value = response.data.data
+      deviceTasks.value = asTaskArray(response.data)
       return response.data
     } catch (error) {
       toast.error('Failed to fetch device tasks')
@@ -70,7 +90,7 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.get('/api/task-handler/tasks/user/assigned', { params })
-      assignedTasks.value = response.data.data
+      assignedTasks.value = asTaskArray(response.data)
       return response.data
     } catch (error) {
       toast.error('Failed to fetch assigned tasks')
@@ -84,8 +104,8 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.get(`/api/task-handler/tasks/get-task/${taskId}`)
-      currentTask.value = response.data.data
-      return response.data.data
+      currentTask.value = asTask(response.data)
+      return currentTask.value
     } catch (error) {
       toast.error('Failed to fetch task')
       throw error
@@ -112,12 +132,15 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.post('/api/task-handler/tasks/create-task', data)
-      tasks.value.unshift(response.data.data)
-      userTasks.value.unshift(response.data.data)
+      const created = asTask(response.data)
+      if (created) {
+        tasks.value.unshift(created)
+        userTasks.value.unshift(created)
+      }
       toast.success('Task created successfully!')
-      return response.data.data
+      return created
     } catch (error) {
-      toast.error('Failed to create task')
+      toast.error(errorMessage(error, 'Failed to create task'))
       throw error
     } finally {
       loading.value = false
@@ -128,21 +151,22 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.put(`/api/task-handler/tasks/update/${taskId}/details`, data)
+      const updated = asTask(response.data)
       const index = tasks.value.findIndex(t => t._id === taskId)
       if (index !== -1) {
-        tasks.value[index] = response.data.data
+        tasks.value[index] = updated
       }
       const userIndex = userTasks.value.findIndex(t => t._id === taskId)
       if (userIndex !== -1) {
-        userTasks.value[userIndex] = response.data.data
+        userTasks.value[userIndex] = updated
       }
       if (currentTask.value?._id === taskId) {
-        currentTask.value = response.data.data
+        currentTask.value = updated
       }
       toast.success('Task updated successfully!')
-      return response.data.data
+      return updated
     } catch (error) {
-      toast.error('Failed to update task')
+      toast.error(errorMessage(error, 'Failed to update task'))
       throw error
     } finally {
       loading.value = false
@@ -153,21 +177,22 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.put(`/api/task-handler/tasks/${taskId}/schedule/update`, { schedule })
+      const updated = asTask(response.data)
       const index = tasks.value.findIndex(t => t._id === taskId)
       if (index !== -1) {
-        tasks.value[index] = response.data.data
+        tasks.value[index] = updated
       }
       const userIndex = userTasks.value.findIndex(t => t._id === taskId)
       if (userIndex !== -1) {
-        userTasks.value[userIndex] = response.data.data
+        userTasks.value[userIndex] = updated
       }
       if (currentTask.value?._id === taskId) {
-        currentTask.value = response.data.data
+        currentTask.value = updated
       }
       toast.success('Task schedule updated successfully!')
-      return response.data.data
+      return updated
     } catch (error) {
-      toast.error('Failed to update task schedule')
+      toast.error(errorMessage(error, 'Failed to update task schedule'))
       throw error
     } finally {
       loading.value = false
@@ -178,21 +203,22 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.put(`/api/task-handler/tasks/${taskId}/status`, { status })
+      const updated = asTask(response.data)
       const index = tasks.value.findIndex(t => t._id === taskId)
       if (index !== -1) {
-        tasks.value[index] = response.data.data
+        tasks.value[index] = updated
       }
       const userIndex = userTasks.value.findIndex(t => t._id === taskId)
       if (userIndex !== -1) {
-        userTasks.value[userIndex] = response.data.data
+        userTasks.value[userIndex] = updated
       }
       if (currentTask.value?._id === taskId) {
-        currentTask.value = response.data.data
+        currentTask.value = updated
       }
       toast.success(`Task status updated to ${status}`)
-      return response.data.data
+      return updated
     } catch (error) {
-      toast.error('Failed to update task status')
+      toast.error(errorMessage(error, 'Failed to update task status'))
       throw error
     } finally {
       loading.value = false
@@ -203,13 +229,14 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     try {
       const response = await api.put(`/api/task-handler/tasks/${taskId}/notifications/add-recepiant`, { userId })
+      const updated = asTask(response.data)
       if (currentTask.value?._id === taskId) {
-        currentTask.value = response.data.data
+        currentTask.value = updated
       }
       toast.success('Notification recipient added!')
-      return response.data.data
+      return updated
     } catch (error) {
-      toast.error('Failed to add notification recipient')
+      toast.error(errorMessage(error, 'Failed to add notification recipient'))
       throw error
     } finally {
       loading.value = false
