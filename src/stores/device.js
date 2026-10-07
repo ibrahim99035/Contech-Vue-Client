@@ -28,11 +28,19 @@ export const useDeviceStore = defineStore('device', () => {
 
   const DEVICE_STATUSES = ['on', 'off', 'locked', 'unlocked']
 
-  // The per-room endpoint nests the array under data.devices, while other
-  // endpoints may return a bare array. Normalize both shapes to an array.
+  // The per-room endpoint nests the array under data.devices alongside the
+  // room they belong to, while other endpoints may return a bare array.
+  // Normalize both shapes to an array, attaching the room to each device so
+  // lists and the detail page can show its name.
   function asDeviceArray(payload) {
     if (Array.isArray(payload)) return payload
-    if (payload && Array.isArray(payload.devices)) return payload.devices
+    if (payload && Array.isArray(payload.devices)) {
+      const room = payload.room
+      if (room && typeof room === 'object') {
+        return payload.devices.map((device) => (device.room ? device : { ...device, room }))
+      }
+      return payload.devices
+    }
     return []
   }
 
