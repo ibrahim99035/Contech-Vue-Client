@@ -1,31 +1,38 @@
 <template>
-  <ConfirmDialog 
-    :visible="visible" 
-    :message="message"
+  <Dialog
+    :visible="visible"
     :header="header"
-    :icon="icon"
-    @accept="onAccept"
-    @reject="onReject"
+    modal
+    class="confirm-dialog"
+    :style="{ width: '28rem' }"
+    role="alertdialog"
+    @update:visible="emit('update:visible', $event)"
   >
+    <div class="confirm-body">
+      <i :class="['confirm-icon', icon]" />
+      <span class="confirm-message">{{ message }}</span>
+    </div>
+
     <template #footer>
-      <button class="btn btn-secondary" @click="onReject">
+      <button type="button" class="btn btn-secondary" @click="onReject">
         Cancel
       </button>
-      <button 
-        class="btn" 
+      <button
+        type="button"
+        class="btn"
         :class="acceptClass"
-        @click="onAccept"
         :disabled="acceptLoading"
+        @click="onAccept"
       >
-        <span v-if="acceptLoading"><i class="pi pi-spin pi-spinner"></i></span>
+        <span v-if="acceptLoading"><i class="pi pi-spin pi-spinner" /></span>
         <span v-else>{{ acceptLabel }}</span>
       </button>
     </template>
-  </ConfirmDialog>
+  </Dialog>
 </template>
 
 <script setup>
-import ConfirmDialog from 'primevue/confirmdialog'
+import Dialog from 'primevue/dialog'
 
 defineProps({
   visible: { type: Boolean, default: false },
@@ -52,6 +59,24 @@ function onReject() {
 <style lang="scss" scoped>
 @import '@/assets/styles/variables';
 
+.confirm-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.confirm-icon {
+  font-size: 1.5rem;
+  color: var(--red-500);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.confirm-message {
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -64,7 +89,7 @@ function onReject() {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -75,7 +100,7 @@ function onReject() {
   background: var(--surface-ground);
   border: 1px solid var(--surface-border);
   color: var(--text-color);
-  
+
   &:hover:not(:disabled) {
     background: var(--surface-hover);
   }
@@ -84,7 +109,7 @@ function onReject() {
 .btn-danger {
   background: var(--red-500);
   color: white;
-  
+
   &:hover:not(:disabled) {
     background: var(--red-600);
   }
@@ -93,7 +118,7 @@ function onReject() {
 .btn-primary {
   background: var(--primary-color);
   color: white;
-  
+
   &:hover:not(:disabled) {
     background: var(--primary-600);
   }
