@@ -47,7 +47,7 @@
             required
           >
             <option value="">Select room</option>
-            <option v-for="room in availableRooms" :key="room._id" :value="room._id">{{ room.name }}</option>
+            <option v-for="room in availableRooms" :key="room.id || room._id" :value="room.id || room._id">{{ room.name }}</option>
           </select>
         </div>
         
@@ -130,7 +130,7 @@ async function loadRooms() {
     if (props.roomId) {
       form.value.room = props.roomId
     } else if (availableRooms.value.length > 0) {
-      form.value.room = availableRooms.value[0]._id
+      form.value.room = availableRooms.value[0].id || availableRooms.value[0]._id
     }
     await loadAvailableOrders()
   } catch (error) {

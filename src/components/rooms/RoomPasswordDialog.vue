@@ -131,7 +131,7 @@ async function handleSubmit() {
   
   submitting.value = true
   try {
-    await roomStore.updateRoomPassword(props.room._id, form.value.newPassword || undefined)
+    await roomStore.updateRoomPassword(props.room._id || props.room.id, form.value.newPassword || undefined)
     emit('updated')
     toast.success(form.value.newPassword ? 'Password updated successfully!' : 'Password removed successfully!')
     onClose()

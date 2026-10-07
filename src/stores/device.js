@@ -28,6 +28,14 @@ export const useDeviceStore = defineStore('device', () => {
 
   const DEVICE_STATUSES = ['on', 'off', 'locked', 'unlocked']
 
+  // The per-room endpoint nests the array under data.devices, while other
+  // endpoints may return a bare array. Normalize both shapes to an array.
+  function asDeviceArray(payload) {
+    if (Array.isArray(payload)) return payload
+    if (payload && Array.isArray(payload.devices)) return payload.devices
+    return []
+  }
+
   async function fetchDevicesByRoom(roomId, params = {}) {
     if (!roomId) {
       roomDevices.value = []
@@ -36,7 +44,7 @@ export const useDeviceStore = defineStore('device', () => {
     loading.value = true
     try {
       const response = await api.get(`/api/device-handler/devices/room/${roomId}`, { params })
-      roomDevices.value = response.data.data
+      roomDevices.value = asDeviceArray(response.data.data)
       return response.data
     } catch (error) {
       toast.error('Failed to fetch devices')
@@ -62,7 +70,7 @@ export const useDeviceStore = defineStore('device', () => {
         rooms.map((room) =>
           api
             .get(`/api/device-handler/devices/room/${room.id || room._id}`)
-            .then((r) => (Array.isArray(r.data?.data) ? r.data.data : []))
+            .then((r) => asDeviceArray(r.data?.data))
             .catch(() => [])
         )
       )
@@ -99,8 +107,8 @@ export const useDeviceStore = defineStore('device', () => {
         const results = await Promise.all(
           rooms.map((room) =>
             api
-              .get(`/api/device-handler/devices/room/${room._id}`)
-              .then((r) => (Array.isArray(r.data?.data) ? r.data.data : []))
+              .get(`/api/device-handler/devices/room/${room.id || room._id}`)
+              .then((r) => asDeviceArray(r.data?.data))
               .catch(() => [])
           )
         )

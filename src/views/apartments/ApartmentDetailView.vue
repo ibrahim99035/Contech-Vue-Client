@@ -189,7 +189,11 @@ async function loadDevices() {
     const results = await Promise.allSettled(devicePromises)
     allDevices.value = results
       .filter(r => r.status === 'fulfilled')
-      .flatMap(r => r.value.data || [])
+      .flatMap(r => {
+        const payload = r.value?.data
+        if (Array.isArray(payload)) return payload
+        return payload?.devices || []
+      })
   } catch (error) {
     console.error('Failed to load devices:', error)
   } finally {
@@ -214,7 +218,7 @@ async function loadTasks() {
 }
 
 function viewRoom(room) {
-  router.push(`/apartments/${apartment.value._id}/rooms/${room._id || room}`)
+  router.push(`/apartments/${apartment.value._id}/rooms/${room.id || room._id}`)
 }
 
 function viewDevice(device) {

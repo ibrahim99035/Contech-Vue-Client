@@ -94,7 +94,7 @@ async function handleSubmit() {
     let updated = { ...props.room }
     
     if (updates.name) {
-      updated = await roomStore.updateRoomName(props.room._id, updates.name)
+      updated = await roomStore.updateRoomName(props.room._id || props.room.id, updates.name)
     }
     
     // Type update would require a new API endpoint

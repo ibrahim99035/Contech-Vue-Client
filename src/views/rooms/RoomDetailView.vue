@@ -11,7 +11,7 @@
               <h1>{{ room.name }}</h1>
               <p class="subtitle">
                 <span v-if="room.type">{{ roomTypeLabel }} · </span>
-                {{ room.devices?.length || 0 }} devices
+                {{ deviceStore.roomDevices.length }} devices
                 <span v-if="room.apartment"> · {{ room.apartment.name }}</span>
               </p>
             </div>
@@ -37,7 +37,7 @@
             </div>
             <div class="card-body p-0">
               <DeviceList
-                :devices="room.devices || []"
+                :devices="deviceStore.roomDevices"
                 :loading="devicesLoading"
                 @view-device="viewDevice"
               />
