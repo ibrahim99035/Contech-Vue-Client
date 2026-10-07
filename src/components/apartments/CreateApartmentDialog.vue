@@ -51,7 +51,6 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import Dialog from 'primevue/dialog'
 import { useApartmentStore } from '@/stores/apartment'
-import { useToast } from 'vue-toastification'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -62,7 +61,6 @@ const emit = defineEmits(['update:visible', 'created', 'updated'])
 
 const authStore = useAuthStore()
 const apartmentStore = useApartmentStore()
-const toast = useToast()
 
 const form = ref({ name: '' })
 const submitting = ref(false)
@@ -83,11 +81,9 @@ async function handleSubmit() {
     if (props.apartment) {
       const updated = await apartmentStore.updateApartmentName(props.apartment._id, form.value.name.trim())
       emit('updated', updated)
-      toast.success('Apartment updated successfully!')
     } else {
       await apartmentStore.createApartment({ name: form.value.name.trim() })
       emit('created')
-      toast.success('Apartment created successfully!')
     }
     onClose()
   } catch (error) {

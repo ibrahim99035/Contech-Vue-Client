@@ -51,7 +51,7 @@
                 </template>
               </Column>
               
-              <Column field="creator" header="Creator" :style="{ width: '20%' }">
+              <Column field="creator" header="Creator" :style="{ width: '18%' }">
                 <template #body="slotProps">
                   <div v-if="slotProps.data.creator">
                     <span>{{ slotProps.data.creator.name || 'Unknown' }}</span>
@@ -61,19 +61,19 @@
                 </template>
               </Column>
               
-              <Column field="membersCount" header="Members" :style="{ width: '12%' }">
+              <Column field="membersCount" header="Members" :style="{ width: '10%' }">
                 <template #body="slotProps">
                   <span class="badge">{{ slotProps.data.members?.length || 0 }}</span>
                 </template>
               </Column>
               
-              <Column field="roomsCount" header="Rooms" :style="{ width: '12%' }">
+              <Column field="roomsCount" header="Rooms" :style="{ width: '10%' }">
                 <template #body="slotProps">
                   <span class="badge">{{ slotProps.data.roomsCount || 0 }}</span>
                 </template>
               </Column>
               
-              <Column field="devicesCount" header="Devices" :style="{ width: '12%' }">
+              <Column field="devicesCount" header="Devices" :style="{ width: '10%' }">
                 <template #body="slotProps">
                   <span class="badge">{{ slotProps.data.devicesCount || 0 }}</span>
                 </template>
@@ -82,6 +82,20 @@
               <Column field="createdAt" header="Created" :style="{ width: '14%' }">
                 <template #body="slotProps">
                   <span>{{ formatDate(slotProps.data.createdAt) }}</span>
+                </template>
+              </Column>
+
+              <Column header="Actions" :style="{ width: '8%' }">
+                <template #body="slotProps">
+                  <button
+                    type="button"
+                    class="btn-icon"
+                    title="Delete apartment"
+                    aria-label="Delete apartment"
+                    @click.stop="startDelete(slotProps.data)"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
                 </template>
               </Column>
             </DataTable>
@@ -109,7 +123,6 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApartmentStore } from '@/stores/apartment'
-import { useToast } from 'vue-toastification'
 import MainLayout from '@/layouts/MainLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Column from 'primevue/column'
@@ -118,7 +131,6 @@ import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 
 const router = useRouter()
 const apartmentStore = useApartmentStore()
-const toast = useToast()
 
 const apartments = ref([])
 const loading = ref(false)
@@ -164,7 +176,6 @@ function onSelectionChange(selection) {
 function onApartmentCreated() {
   showCreateDialog.value = false
   loadApartments(pagination.value.page, searchQuery.value)
-  toast.success('Apartment created successfully!')
 }
 
 function viewApartment(apartment) {
@@ -180,6 +191,11 @@ function editApartment(apartment) {
   router.push(`/apartments/${apartment._id}`)
 }
 
+function startDelete(apartment) {
+  selectedApartment.value = apartment
+  showDeleteDialog.value = true
+}
+
 function confirmDelete() {
   if (!selectedApartment.value) return
   
@@ -188,7 +204,6 @@ function confirmDelete() {
       showDeleteDialog.value = false
       selectedApartment.value = null
       loadApartments(pagination.value.page, searchQuery.value)
-      toast.success('Apartment deleted successfully!')
     })
     .catch(() => {
       // Error handled in store
@@ -273,6 +288,25 @@ watch(() => apartmentStore.apartments, (newApartments) => {
     align-items: center;
     justify-content: center;
     font-size: 1rem;
+  }
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--red-50);
+    color: var(--red-600);
   }
 }
 
