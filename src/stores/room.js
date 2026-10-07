@@ -48,17 +48,28 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
-  async function fetchRoomById(id) {
+  async function fetchRoomById(id, apartmentId = null) {
     loading.value = true
     try {
-      if (!rooms.value.length) {
+      // The apartment endpoint returns the richest room shape (id, type,
+      // espConnected, users...), so prefer it when we know the apartment.
+      // Fetching rooms into the wrong array (userRooms) and searching by _id
+      // while list endpoints return `id` made direct/reload navigation to a
+      // room fail with "Room not found" and hit /devices/room/undefined.
+      if (apartmentId) {
+        await fetchRoomsByApartment(apartmentId)
+      } else if (!rooms.value.length) {
         await fetchUserRooms()
       }
-      const found = rooms.value.find(r => r._id === id)
+      const pool = [...rooms.value, ...userRooms.value]
+      const found = pool.find(r => (r._id || r.id) === id)
       if (!found) {
         const error = new Error('Room not found')
         error.response = { status: 404, data: { message: 'Room not found' } }
         throw error
+      }
+      if (!found._id && found.id) {
+        found._id = found.id
       }
       currentRoom.value = found
       return found

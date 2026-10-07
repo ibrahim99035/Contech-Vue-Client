@@ -10,7 +10,7 @@
           <div class="header-filters">
             <select v-model="roomFilter" class="filter-select" @change="loadDevices">
               <option value="">All Rooms</option>
-              <option v-for="room in userRooms" :key="room._id" :value="room._id">{{ room.name }}</option>
+              <option v-for="room in userRooms" :key="room.id || room._id" :value="room.id || room._id">{{ room.name }}</option>
             </select>
             <select v-model="typeFilter" class="filter-select" @change="loadDevices">
               <option value="">All Types</option>
@@ -126,7 +126,7 @@ const showCreateDialog = ref(false)
 const deviceTypes = computed(() => deviceStore.DEVICE_TYPES)
 
 const selectedRoom = computed(() => {
-  return userRooms.value.find(r => r._id === roomFilter.value) || null
+  return userRooms.value.find(r => (r.id || r._id) === roomFilter.value) || null
 })
 
 async function loadRooms() {

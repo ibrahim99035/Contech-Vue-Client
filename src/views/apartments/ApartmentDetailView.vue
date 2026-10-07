@@ -184,7 +184,7 @@ async function loadDevices() {
   try {
     const rooms = apartment.value.rooms || []
     const devicePromises = rooms.map(room => 
-      deviceStore.fetchDevicesByRoom(room._id || room)
+      deviceStore.fetchDevicesByRoom(room.id || room._id)
     )
     const results = await Promise.allSettled(devicePromises)
     allDevices.value = results

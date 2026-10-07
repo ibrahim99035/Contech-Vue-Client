@@ -176,7 +176,7 @@ const roomTypeLabel = computed(() => {
 
 async function loadRoom() {
   try {
-    const data = await roomStore.fetchRoomById(route.params.roomId)
+    const data = await roomStore.fetchRoomById(route.params.roomId, route.params.apartmentId)
     room.value = data
     await loadDevices()
   } catch (error) {
@@ -185,7 +185,7 @@ async function loadRoom() {
 }
 
 async function loadDevices() {
-  if (!room.value) return
+  if (!room.value?._id) return
   devicesLoading.value = true
   try {
     await deviceStore.fetchDevicesByRoom(room.value._id)
